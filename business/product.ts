@@ -154,8 +154,12 @@ const GetProductItem = async (user: string, lang: string, id: number) => {
 
     let notified: any =
       user === "" ||
-      (await Notifications.count({ user_id: user, product_id: product.id })) ===
-        0
+      (await Notifications.count({
+        user_id: user,
+        refer_id: product.id,
+        seen: false,
+        active: false,
+      })) === 0
         ? false
         : true;
 

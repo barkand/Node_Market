@@ -10,6 +10,8 @@ import {
 
 import { verifyToken } from "../../admin";
 
+import { ActiveNotify } from "../../admin/business/notify";
+
 class BuyController {
   buyByUser = async (req: any, res: any) => {
     let { wallet, token } = req.cookies;
@@ -83,8 +85,13 @@ class BuyController {
     let _verify = await verifyToken(token);
     if (_verify.code !== 200) res.status(_verify.code).send(_verify);
 
-    let _result = await SaveForSale(wallet, product, forSale);
-    res.status(_result.code).send(_result);
+    let _result_save = await SaveForSale(wallet, product, forSale);
+    if (_result_save.code !== 200)
+      res.status(_result_save.code).send(_result_save);
+
+    let _result_active_notify = await ActiveNotify(product);
+
+    res.status(_result_active_notify.code).send(_result_active_notify);
   };
 }
 
