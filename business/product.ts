@@ -1,4 +1,5 @@
 import { Products, Favorites, Buys } from "../models";
+import { GetCacheGroups, SetCacheGroups } from "./cache/product";
 
 import logger from "../../log";
 import { response } from "../../core";
@@ -192,14 +193,20 @@ const GetProductItem = async (user: string, lang: string, id: number) => {
 
 const GetGroups = async (lang: string) => {
   try {
-    let teams: any = await Products.aggregate([
-      {
-        $group: {
-          _id: { id: "$teamId", title: lang === "en" ? "$teamEn" : "$team" },
-        },
-      },
-    ]);
+    let teams: any = await GetCacheGroups(lang);
 
+    if (teams) {
+    } else {
+      let teams: any = await Products.aggregate([
+        {
+          $group: {
+            _id: { id: "$teamId", title: lang === "en" ? "$teamEn" : "$team" },
+          },
+        },
+      ]);
+
+      SetCacheGroups(lang, teams);
+    }
     return { ...response.success, data: teams };
   } catch (e: any) {
     logger.error(`${path}GetGroups: ${e}`);
