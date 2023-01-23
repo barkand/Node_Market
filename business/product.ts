@@ -13,15 +13,12 @@ const GetProducts = async (
   lang: string,
   pages: any
 ) => {
-  let _condition: any = {};
   try {
-    let _cache: any = await GetCache(
-      `Products:${lang}:${user}:${filter}:${pages}`
+    let _condition: any = await GetCache(
+      `Products_condition:${lang}:${filter}:${pages}`
     );
-    let products: any = _cache?.products;
-    let counts: any = _cache?.counts;
 
-    if (!products) {
+    if (!_condition) {
       if (Object.keys(filter).length > 0) {
         if (filter.team.length > 0)
           _condition =
@@ -54,47 +51,44 @@ const GetProducts = async (
           };
       }
 
-      let _products = await Products.find(_condition)
-        .skip(pages.pageNumber > 0 ? (pages.pageNumber - 1) * pages.perPage : 0)
-        .limit(pages.perPage);
-
-      counts = await Products.find(_condition).count();
-      let favorites: any =
-        user !== ""
-          ? await Favorites.find({
-              user_id: user,
-              product_id: { $in: _products.map((p: any) => p.id) },
-            })
-          : [];
-      let buys: any = await Buys.find({
-        product_id: { $in: _products.map((p: any) => p.id) },
-      });
-
-      products = [];
-      _products.forEach((product: any) => {
-        products.push({
-          id: product.id,
-          name: product.name,
-          image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
-          price: product.price,
-          liked:
-            user === ""
-              ? false
-              : favorites.some((fav: any) => fav.product_id === product.id),
-          soled: buys.some((b: any) => b.product_id === product.id),
-          forSale:
-            product.forSale &&
-            !buys.some(
-              (b: any) => b.product_id === product.id && b.user_id === user
-            ),
-        });
-      });
-
-      SetCache(`Products:${lang}:${user}:${filter}:${pages}`, {
-        products,
-        counts,
-      });
+      SetCache(`Products_condition:${lang}:${filter}:${pages}`, _condition);
     }
+
+    let _products = await Products.find(_condition)
+      .skip(pages.pageNumber > 0 ? (pages.pageNumber - 1) * pages.perPage : 0)
+      .limit(pages.perPage);
+
+    let counts = await Products.find(_condition).count();
+    let favorites: any =
+      user !== ""
+        ? await Favorites.find({
+            user_id: user,
+            product_id: { $in: _products.map((p: any) => p.id) },
+          })
+        : [];
+    let buys: any = await Buys.find({
+      product_id: { $in: _products.map((p: any) => p.id) },
+    });
+
+    let products = [];
+    _products.forEach((product: any) => {
+      products.push({
+        id: product.id,
+        name: product.name,
+        image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
+        price: product.price,
+        liked:
+          user === ""
+            ? false
+            : favorites.some((fav: any) => fav.product_id === product.id),
+        soled: buys.some((b: any) => b.product_id === product.id),
+        forSale:
+          product.forSale &&
+          !buys.some(
+            (b: any) => b.product_id === product.id && b.user_id === user
+          ),
+      });
+    });
 
     return {
       ...response.success,
@@ -163,51 +157,50 @@ const GetProductsFilter = async (lang: string) => {
 
 const GetProductItem = async (user: string, lang: string, id: number) => {
   try {
-    let data: any = await GetCache(`ProductsItem:${lang}`);
+    let product: any = await GetCache(`ProductsItem:${id}`);
+    if (!product) {
+      product = await Products.findOne({ id: id }, { _id: 0 });
 
-    if (!data) {
-      let product: any = await Products.findOne({ id: id }, { _id: 0 });
-      let liked: any =
-        user === "" ||
-        (await Favorites.count({ user_id: user, product_id: product.id })) === 0
-          ? false
-          : true;
-
-      let _buy: any = await Buys.findOne({ product_id: product.id });
-      let soled = _buy ? true : false;
-
-      let notified: any =
-        user === "" ||
-        (await Notifications.count({
-          user_id: user,
-          refer_id: product.id,
-          seen: false,
-          active: false,
-        })) === 0
-          ? false
-          : true;
-
-      data = {
-        id: product.id,
-        code: product.code,
-        name: lang === "en" ? product.nameEn : product.name,
-        number: product.number,
-        age: product.age,
-        team: lang === "en" ? product.teamEn : product.team,
-        country: lang === "en" ? product.countryEn : product.country,
-        position: lang === "en" ? product.positionEn : product.position,
-        card: lang === "en" ? product.cardEn : product.card,
-        image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
-        price: product.price,
-        liked: liked,
-        soled: soled,
-        forSale: product.forSale,
-        notified: notified,
-        owner: _buy?.user_id,
-      };
-
-      SetCache(`ProductsItem:${lang}`, data);
+      SetCache(`ProductsItem:${id}`, product);
     }
+
+    let _buy = await Buys.findOne({ product_id: product.id });
+    let soled = _buy ? true : false;
+    let liked: any =
+      user === "" ||
+      (await Favorites.count({ user_id: user, product_id: product.id })) === 0
+        ? false
+        : true;
+
+    let notified: any =
+      user === "" ||
+      (await Notifications.count({
+        user_id: user,
+        refer_id: product.id,
+        seen: false,
+        active: false,
+      })) === 0
+        ? false
+        : true;
+
+    let data: any = {
+      id: product.id,
+      code: product.code,
+      name: lang === "en" ? product.nameEn : product.name,
+      number: product.number,
+      age: product.age,
+      team: lang === "en" ? product.teamEn : product.team,
+      country: lang === "en" ? product.countryEn : product.country,
+      position: lang === "en" ? product.positionEn : product.position,
+      card: lang === "en" ? product.cardEn : product.card,
+      image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
+      price: product.price,
+      liked: liked,
+      soled: soled,
+      forSale: product.forSale,
+      notified: notified,
+      owner: _buy?.user_id,
+    };
 
     return {
       ...response.success,
