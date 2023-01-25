@@ -25,7 +25,6 @@ const GetFavorites = async (user: number, pages: any) => {
       });
       _favorites.push({
         id: product.id,
-        name: product.name,
         price: product.price,
         image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
         liked: true,

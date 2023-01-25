@@ -21,7 +21,6 @@ const GetBuyByUser = async (user: number, pages: any) => {
       let product: any = await Products.findOne({ id: buys[i].product_id });
       _buys.push({
         id: product.id,
-        name: product.name,
         price: product.price,
         image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
         liked: favorites.some((fav: any) => fav.product_id === product.id),

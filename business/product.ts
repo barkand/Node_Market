@@ -1,7 +1,7 @@
 import { Products, Favorites, Buys } from "../models";
 
 import logger from "../../log";
-import { response } from "../../core";
+import { response, toPascalCase } from "../../core";
 import { Notifications } from "../../admin/models";
 import { GetCache, SetCache } from "../../core/database";
 
@@ -25,25 +25,25 @@ const GetProducts = async (
           _condition =
             lang === "en"
               ? { ..._condition, teamEn: { $in: filter.team } }
-              : { ..._condition, team: { $in: filter.team } };
+              : { ..._condition, teamFa: { $in: filter.team } };
 
         if (filter.country.length > 0)
           _condition =
             lang === "en"
               ? { ..._condition, countryEn: { $in: filter.country } }
-              : { ..._condition, country: { $in: filter.country } };
+              : { ..._condition, countryFa: { $in: filter.country } };
 
         if (filter.position.length > 0)
           _condition =
             lang === "en"
               ? { ..._condition, positionEn: { $in: filter.position } }
-              : { ..._condition, position: { $in: filter.position } };
+              : { ..._condition, positionFa: { $in: filter.position } };
 
         if (filter.card.length > 0)
           _condition =
             lang === "en"
               ? { ..._condition, cardEn: { $in: filter.card } }
-              : { ..._condition, card: { $in: filter.card } };
+              : { ..._condition, cardFa: { $in: filter.card } };
 
         if (filter.age.length > 0)
           _condition = {
@@ -78,7 +78,6 @@ const GetProducts = async (
     _products.forEach((product: any) => {
       products.push({
         id: product.id,
-        name: product.name,
         image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
         price: product.price,
         liked:
@@ -114,18 +113,13 @@ const GetProductsFilter = async (lang: string) => {
   try {
     let data = await GetCache(`ProductsFilter:${lang}`);
     if (!data) {
-      if (lang === "en") {
-        positions = await Products.distinct("positionEn");
-        countries = await Products.distinct("countryEn");
-        teams = await Products.distinct("teamEn");
-        cards = ["Golden", "Silver", "Bronze"]; //TODO: await Products.distinct("cardEn");
-      } else {
-        positions = await Products.distinct("position");
-        countries = await Products.distinct("country");
-        teams = await Products.distinct("team");
-        cards = ["طلایی", "نقره ای", "برنزی"]; //TODO: await Products.distinct("card");
-      }
-
+      positions = await Products.distinct(`position${toPascalCase(lang)}`);
+      countries = await Products.distinct(`country${toPascalCase(lang)}`);
+      teams = await Products.distinct(`team${toPascalCase(lang)}`);
+      cards =
+        lang === "en" //TODO: await Products.distinct(`card${toPascalCase(lang)}`);
+          ? ["Golden", "Silver", "Bronze"]
+          : ["طلایی", "نقره ای", "برنزی"];
       let _ages = await Products.aggregate([
         {
           $group: {
@@ -190,13 +184,13 @@ const GetProductItem = async (user: string, lang: string, id: number) => {
     let data: any = {
       id: product.id,
       code: product.code,
-      name: lang === "en" ? product.nameEn : product.name,
       number: product.number,
       age: product.age,
-      team: lang === "en" ? product.teamEn : product.team,
-      country: lang === "en" ? product.countryEn : product.country,
-      position: lang === "en" ? product.positionEn : product.position,
-      card: lang === "en" ? product.cardEn : product.card,
+      name: lang === "en" ? product.nameEn : product.nameFa,
+      team: lang === "en" ? product.teamEn : product.teamFa,
+      country: lang === "en" ? product.countryEn : product.countryFa,
+      position: lang === "en" ? product.positionEn : product.positionFa,
+      card: lang === "en" ? product.cardEn : product.cardFa,
       image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
       price: product.price,
       liked: liked,
@@ -224,7 +218,10 @@ const GetGroups = async (lang: string) => {
       teams = await Products.aggregate([
         {
           $group: {
-            _id: { id: "$teamId", title: lang === "en" ? "$teamEn" : "$team" },
+            _id: {
+              id: "$teamId",
+              title: `$team${toPascalCase(lang)}`,
+            },
           },
         },
       ]);
