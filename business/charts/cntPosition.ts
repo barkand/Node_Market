@@ -1,6 +1,6 @@
 import { Products } from "../../models";
 
-import { toPascalCase, randomColor } from "../../../core/libs";
+import { toPascalCase } from "../../../core/libs";
 
 import logger from "../../../log";
 import { response } from "../../../core";
@@ -9,6 +9,8 @@ import { GetCache, SetCache } from "../../../core/database";
 const path = "Market>Business>chart>";
 
 const GetChartCntPosition = async (lang: string) => {
+  const colors: any = ["#0d1321", "#1d2d44", "#3e5c76", "#748cab"];
+
   try {
     let post_count: any = await GetCache(`cntPost:${lang}`);
     if (!post_count) {
@@ -23,8 +25,8 @@ const GetChartCntPosition = async (lang: string) => {
       ]);
 
       post_count = [];
-      _post_count.map((item: any) => {
-        post_count.push({ ...item, name: item._id, fill: randomColor() });
+      _post_count.map((item: any, idx: number) => {
+        post_count.push({ ...item, name: item._id, fill: colors[idx] });
       });
 
       SetCache(`cntPost:${lang}`, post_count);

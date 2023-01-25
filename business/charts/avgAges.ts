@@ -15,11 +15,11 @@ const GetChartAvgAges = async () => {
         { $group: { _id: "$age", count: { $sum: 1 } } },
       ]);
       avg_ages = [
-        { name: "15-20", value: 0, fill: "#0088FE" },
-        { name: "20-25", value: 0, fill: "#00C49F" },
-        { name: "25-30", value: 0, fill: "#FFBB28" },
-        { name: "30-35", value: 0, fill: "#FF8042" },
-        { name: "35-40", value: 0, fill: "#AFBA28" },
+        { name: "15-20", value: 0, fill: "#ff99c8" },
+        { name: "20-25", value: 0, fill: "#fcf6bd" },
+        { name: "25-30", value: 0, fill: "#d0f4de" },
+        { name: "30-35", value: 0, fill: "#a9def9" },
+        { name: "35-40", value: 0, fill: "#e4c1f9" },
       ];
       for (let i = 0; i < ages_count.length; i++) {
         if (ages_count[i]._id <= 20) avg_ages[0].value += ages_count[i].count;
