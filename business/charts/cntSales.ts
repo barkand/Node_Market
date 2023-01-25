@@ -2,34 +2,58 @@ import { Products, Buys } from "../../models";
 
 import logger from "../../../log";
 import { response } from "../../../core";
+import { GetCache, SetCache } from "../../../core/database";
 
 const path = "Market>Business>chart>";
 
 const GetChartCntSales = async () => {
   try {
-    let cnt_gold: number =
-      (
-        await Products.aggregate([
-          { $match: { cardEn: "Golden" } },
-          { $group: { _id: "", count: { $sum: 1 } } },
-        ])
-      )[0].count ?? 0;
+    let cnt_gold = await GetCache("cnt_gold");
+    if (!cnt_gold) {
+      cnt_gold =
+        (
+          await Products.aggregate([
+            { $match: { cardEn: "Golden" } },
+            { $group: { _id: "", count: { $sum: 1 } } },
+          ])
+        )[0].count ?? 0;
 
-    let gold: number =
+      SetCache("cnt_gold", cnt_gold);
+    }
+
+    let cnt_silver = await GetCache("cnt_silver");
+    if (!cnt_silver) {
+      cnt_silver =
+        (
+          await Products.aggregate([
+            { $match: { cardEn: "Silver" } },
+            { $group: { _id: "", count: { $sum: 1 } } },
+          ])
+        )[0]?.count ?? 0;
+
+      SetCache("cnt_silver", cnt_silver);
+    }
+
+    let cnt_bronze = await GetCache("cnt_bronze");
+    if (!cnt_bronze) {
+      cnt_bronze =
+        (
+          await Products.aggregate([
+            { $match: { cardEn: "Bronze" } },
+            { $group: { _id: "", count: { $sum: 1 } } },
+          ])
+        )[0]?.count ?? 0;
+
+      SetCache("cnt_bronze", cnt_bronze);
+    }
+
+    let gold =
       (
         await Buys.aggregate([
           { $match: { product_id: { $lt: 1000 } } },
           { $group: { _id: "", value1: { $sum: 1 } } },
         ])
       )[0]?.value1 ?? 0;
-
-    let cnt_silver =
-      (
-        await Products.aggregate([
-          { $match: { cardEn: "Silver" } },
-          { $group: { _id: "", count: { $sum: 1 } } },
-        ])
-      )[0]?.count ?? 0;
 
     let silver =
       (
@@ -38,14 +62,6 @@ const GetChartCntSales = async () => {
           { $group: { _id: "", value1: { $sum: 1 } } },
         ])
       )[0]?.value1 ?? 0;
-
-    let cnt_bronze =
-      (
-        await Products.aggregate([
-          { $match: { cardEn: "Bronze" } },
-          { $group: { _id: "", count: { $sum: 1 } } },
-        ])
-      )[0]?.count ?? 0;
 
     let bronze =
       (
