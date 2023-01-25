@@ -14,8 +14,9 @@ const GetProducts = async (
   pages: any
 ) => {
   try {
+    let { country, team, position, age, card } = filter;
     let _condition: any = await GetCache(
-      `Products_condition:${lang}:${filter}:${pages}`
+      `Products_condition:${lang}:${country}:${team}:${position}:${age}:${card}:${pages}`
     );
 
     if (!_condition) {
@@ -51,7 +52,10 @@ const GetProducts = async (
           };
       }
 
-      SetCache(`Products_condition:${lang}:${filter}:${pages}`, _condition);
+      SetCache(
+        `Products_condition:${lang}:${country}:${team}:${position}:${age}:${card}:${pages}`,
+        _condition
+      );
     }
 
     let _products = await Products.find(_condition)

@@ -19,7 +19,10 @@ class BuyController {
     let { pages } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result = await GetBuyByUser(wallet, pages);
     res.status(_result.code).send(_result);
@@ -47,7 +50,10 @@ class BuyController {
     let { product, price, txn } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result = await SetBuy(wallet, product, price, txn);
     res.status(_result.code).send(_result);
@@ -59,7 +65,10 @@ class BuyController {
     let { product } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result = await CheckBuy(product);
     res.status(_result.code).send(_result);
@@ -71,7 +80,10 @@ class BuyController {
     let { product, price } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result = await SavePrice(wallet, product, price);
     res.status(_result.code).send(_result);
@@ -83,11 +95,16 @@ class BuyController {
     let { product, forSale } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result_save = await SaveForSale(wallet, product, forSale);
-    if (_result_save.code !== 200)
+    if (_result_save.code !== 200) {
       res.status(_result_save.code).send(_result_save);
+      return;
+    }
 
     let _result_active_notify = await ActiveNotify(product);
 

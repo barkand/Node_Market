@@ -8,7 +8,10 @@ class FavoriteController {
     let { pages } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result = await GetFavorites(wallet, pages);
     res.status(_result.code).send(_result);
@@ -20,7 +23,10 @@ class FavoriteController {
     let { product } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result = await SetFavorite(wallet, product);
     res.status(_result.code).send(_result);
