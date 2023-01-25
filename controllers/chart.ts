@@ -1,4 +1,8 @@
-import { GetChartAvgAges, GetChartCntPosition } from "../business/charts";
+import {
+  GetChartAvgAges,
+  GetChartCntPosition,
+  GetChartCntSales,
+} from "../business/charts";
 
 class ChartController {
   chartAvgAges = async (req: any, res: any) => {
@@ -11,6 +15,11 @@ class ChartController {
     let { lang } = params;
 
     let _result = await GetChartCntPosition(lang);
+    res.status(_result.code).send(_result);
+  };
+
+  chartCntSales = async (req: any, res: any) => {
+    let _result = await GetChartCntSales();
     res.status(_result.code).send(_result);
   };
 }

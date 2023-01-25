@@ -25,6 +25,7 @@ MarketRouters.get("/", (req: any, res: any) => {
       /get-groups
       /chart-avg-ages
       /chart-cnt-position
+      /chart-cnt-sales
     `
   );
 });
@@ -47,5 +48,6 @@ MarketRouters.post(`/save-sale`, buyController.saveForSale);
 
 MarketRouters.post(`/chart-avg-ages`, chartController.chartAvgAges);
 MarketRouters.post(`/chart-cnt-position`, chartController.chartCntPosition);
+MarketRouters.post(`/chart-cnt-sales`, chartController.chartCntSales);
 
 export default MarketRouters;
