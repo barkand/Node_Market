@@ -8,7 +8,7 @@ import { GetCache, SetCache } from "../../core/database";
 const path = "Market>Business>product>";
 
 const GetProducts = async (
-  user: string,
+  user_id: string,
   filter: any,
   lang: string,
   pages: any
@@ -64,9 +64,9 @@ const GetProducts = async (
 
     let counts = await Products.find(_condition).count();
     let favorites: any =
-      user !== ""
+      user_id !== ""
         ? await Favorites.find({
-            user_id: user,
+            user_id: user_id,
             product_id: { $in: _products.map((p: any) => p.id) },
           })
         : [];
@@ -81,14 +81,14 @@ const GetProducts = async (
         image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
         price: product.price,
         liked:
-          user === ""
+          user_id === ""
             ? false
             : favorites.some((fav: any) => fav.product_id === product.id),
         soled: buys.some((b: any) => b.product_id === product.id),
         forSale:
           product.forSale &&
           !buys.some(
-            (b: any) => b.product_id === product.id && b.user_id === user
+            (b: any) => b.product_id === product.id && b.user_id === user_id
           ),
       });
     });
@@ -153,27 +153,32 @@ const GetProductsFilter = async (lang: string) => {
   }
 };
 
-const GetProductItem = async (user: string, lang: string, id: number) => {
+const GetProductItem = async (
+  user_id: string,
+  lang: string,
+  product_id: number
+) => {
   try {
-    let product: any = await GetCache(`ProductsItem:${id}`);
+    let product: any = await GetCache(`ProductsItem:${product_id}`);
     if (!product) {
-      product = await Products.findOne({ id: id }, { _id: 0 });
+      product = await Products.findOne({ id: product_id }, { _id: 0 });
 
-      SetCache(`ProductsItem:${id}`, product);
+      SetCache(`ProductsItem:${product_id}`, product);
     }
 
     let _buy = await Buys.findOne({ product_id: product.id });
     let soled = _buy ? true : false;
     let liked: any =
-      user === "" ||
-      (await Favorites.count({ user_id: user, product_id: product.id })) === 0
+      user_id === "" ||
+      (await Favorites.count({ user_id: user_id, product_id: product.id })) ===
+        0
         ? false
         : true;
 
     let notified: any =
-      user === "" ||
+      user_id === "" ||
       (await Notifications.count({
-        user_id: user,
+        user_id: user_id,
         refer_id: product.id,
         seen: false,
         active: false,

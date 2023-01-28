@@ -3,7 +3,7 @@ import { GetFavorites, SetFavorite } from "../business/favorite";
 
 class FavoriteController {
   favorites = async (req: any, res: any) => {
-    let { wallet, token } = req.cookies;
+    let { user_id, token } = req.cookies;
     let { params } = req.body;
     let { pages } = params;
 
@@ -13,12 +13,12 @@ class FavoriteController {
       return;
     }
 
-    let _result = await GetFavorites(wallet, pages);
+    let _result = await GetFavorites(user_id, pages);
     res.status(_result.code).send(_result);
   };
 
   saveFavorite = async (req: any, res: any) => {
-    const { wallet, token } = req.cookies;
+    const { user_id, token } = req.cookies;
     let { params } = req.body;
     let { product } = params;
 
@@ -28,7 +28,7 @@ class FavoriteController {
       return;
     }
 
-    let _result = await SetFavorite(wallet, product);
+    let _result = await SetFavorite(user_id, product);
     res.status(_result.code).send(_result);
   };
 }

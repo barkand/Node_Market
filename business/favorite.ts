@@ -6,10 +6,10 @@ import { Products } from "../../market/models";
 
 const path = "Market>Business>favorite>";
 
-const GetFavorites = async (user: number, pages: any) => {
+const GetFavorites = async (user_id: string, pages: any) => {
   try {
-    let favorites: any = await Favorites.find({ user_id: user });
-    let counts = await Favorites.find({ user_id: user }).count();
+    let favorites: any = await Favorites.find({ user_id: user_id });
+    let counts = await Favorites.find({ user_id: user_id }).count();
 
     let _favorites: any = [];
     let skip =
@@ -32,7 +32,7 @@ const GetFavorites = async (user: number, pages: any) => {
           (await Buys.count({ product_id: product.id })) > 0 ? true : false,
         forSale:
           product.forSale &&
-          (await Buys.count({ product_id: product.id, user_id: user })) === 0
+          (await Buys.count({ product_id: product.id, user_id: user_id })) === 0
             ? true
             : false,
       });
@@ -48,11 +48,11 @@ const GetFavorites = async (user: number, pages: any) => {
   }
 };
 
-const SetFavorite = async (user: number, product: number) => {
+const SetFavorite = async (user_id: string, product_id: number) => {
   try {
     let _haveLike = await Favorites.findOne({
-      user_id: user,
-      product_id: product,
+      user_id: user_id,
+      product_id: product_id,
     });
 
     if (_haveLike) {
@@ -65,8 +65,8 @@ const SetFavorite = async (user: number, product: number) => {
       }
     } else {
       let _favorites = new Favorites({
-        user_id: user,
-        product_id: product,
+        user_id: user_id,
+        product_id: product_id,
       });
       try {
         await _favorites.save();

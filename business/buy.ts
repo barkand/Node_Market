@@ -5,11 +5,11 @@ import { response } from "../../core";
 
 const path = "Market>Business>buy>";
 
-const GetBuyByUser = async (user: number, pages: any) => {
+const GetBuyByUser = async (user_id: string, pages: any) => {
   try {
-    let buys: any = await Buys.find({ user_id: user });
-    let counts = await Buys.find({ user_id: user }).count();
-    let favorites: any = await Favorites.find({ user_id: user });
+    let buys: any = await Buys.find({ user_id: user_id });
+    let counts = await Buys.find({ user_id: user_id }).count();
+    let favorites: any = await Favorites.find({ user_id: user_id });
 
     let _buys: any = [];
     let skip =
@@ -36,10 +36,10 @@ const GetBuyByUser = async (user: number, pages: any) => {
   }
 };
 
-const GetBuyByItem = async (item: number) => {
+const GetBuyByItem = async (product_id: number) => {
   try {
     let history: any = await Buys.find(
-      { product_id: item },
+      { product_id: product_id },
       { _id: 0, user_id: 1, price: 1 }
     );
 
@@ -50,10 +50,10 @@ const GetBuyByItem = async (item: number) => {
   }
 };
 
-const GetBuy = async (item: number) => {
+const GetBuy = async (product_id: number) => {
   try {
     let buy: any = await Buys.findOne(
-      { product_id: item },
+      { product_id: product_id },
       { _id: 0, user_id: 1, price: 1, txn: 1 }
     ).sort({ $natural: -1 });
 
@@ -65,21 +65,21 @@ const GetBuy = async (item: number) => {
 };
 
 const SetBuy = async (
-  user: number,
-  product: number,
+  user_id: string,
+  product_id: number,
   price: number,
   txn: string
 ) => {
   try {
     let _buys = new Buys({
-      user_id: user,
-      product_id: product,
+      user_id: user_id,
+      product_id: product_id,
       price: price,
       txn: txn,
     });
     await _buys.save();
 
-    await Products.updateOne({ id: product }, { $set: { forSale: false } });
+    await Products.updateOne({ id: product_id }, { $set: { forSale: false } });
 
     return response.success;
   } catch (e: any) {
@@ -88,10 +88,10 @@ const SetBuy = async (
   }
 };
 
-const CheckBuy = async (product: number) => {
+const CheckBuy = async (product_id: number) => {
   try {
     let _bought = await Buys.findOne({
-      product_id: product,
+      product_id: product_id,
     });
     if (!_bought) return response.custom(300, "exist");
 
@@ -102,15 +102,19 @@ const CheckBuy = async (product: number) => {
   }
 };
 
-const SavePrice = async (user: any, product: number, price: number) => {
+const SavePrice = async (
+  user_id: string,
+  product_id: number,
+  price: number
+) => {
   try {
     let _bought = await Buys.findOne({
-      user_id: user,
-      product_id: product,
+      user_id: user_id,
+      product_id: product_id,
     });
     if (!_bought) return response.error;
 
-    await Products.updateOne({ id: product }, { $set: { price: price } });
+    await Products.updateOne({ id: product_id }, { $set: { price: price } });
     return response.success;
   } catch (e: any) {
     logger.error(`${path}SavePrice: ${e}`);
@@ -118,15 +122,22 @@ const SavePrice = async (user: any, product: number, price: number) => {
   }
 };
 
-const SaveForSale = async (user: any, product: number, forSale: boolean) => {
+const SaveForSale = async (
+  user_id: string,
+  product_id: number,
+  forSale: boolean
+) => {
   try {
     let _bought = await Buys.findOne({
-      user_id: user,
-      product_id: product,
+      user_id: user_id,
+      product_id: product_id,
     });
     if (!_bought) return response.error;
 
-    await Products.updateOne({ id: product }, { $set: { forSale: forSale } });
+    await Products.updateOne(
+      { id: product_id },
+      { $set: { forSale: forSale } }
+    );
     return response.success;
   } catch (e: any) {
     logger.error(`${path}SaveForSale: ${e}`);

@@ -14,7 +14,7 @@ import { ActiveNotify } from "../../admin/business/notify";
 
 class BuyController {
   buyByUser = async (req: any, res: any) => {
-    let { wallet, token } = req.cookies;
+    let { user_id, token } = req.cookies;
     let { params } = req.body;
     let { pages } = params;
 
@@ -24,7 +24,7 @@ class BuyController {
       return;
     }
 
-    let _result = await GetBuyByUser(wallet, pages);
+    let _result = await GetBuyByUser(user_id, pages);
     res.status(_result.code).send(_result);
   };
 
@@ -45,7 +45,7 @@ class BuyController {
   };
 
   saveBuy = async (req: any, res: any) => {
-    const { wallet, token } = req.cookies;
+    const { user_id, token } = req.cookies;
     let { params } = req.body;
     let { product, price, txn } = params;
 
@@ -55,7 +55,7 @@ class BuyController {
       return;
     }
 
-    let _result = await SetBuy(wallet, product, price, txn);
+    let _result = await SetBuy(user_id, product, price, txn);
     res.status(_result.code).send(_result);
   };
 
@@ -75,7 +75,7 @@ class BuyController {
   };
 
   updatePrice = async (req: any, res: any) => {
-    const { wallet, token } = req.cookies;
+    const { user_id, token } = req.cookies;
     let { params } = req.body;
     let { product, price } = params;
 
@@ -85,12 +85,12 @@ class BuyController {
       return;
     }
 
-    let _result = await SavePrice(wallet, product, price);
+    let _result = await SavePrice(user_id, product, price);
     res.status(_result.code).send(_result);
   };
 
   saveForSale = async (req: any, res: any) => {
-    const { wallet, token } = req.cookies;
+    const { user_id, token } = req.cookies;
     let { params } = req.body;
     let { product, forSale } = params;
 
@@ -100,7 +100,7 @@ class BuyController {
       return;
     }
 
-    let _result_save = await SaveForSale(wallet, product, forSale);
+    let _result_save = await SaveForSale(user_id, product, forSale);
     if (_result_save.code !== 200) {
       res.status(_result_save.code).send(_result_save);
       return;

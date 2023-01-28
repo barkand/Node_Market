@@ -7,12 +7,12 @@ import {
 
 class MarketController {
   products = async (req: any, res: any) => {
-    let { wallet } = req.cookies;
+    let { user_id } = req.cookies;
     let { params } = req.body;
     let { filter, lang, pages } = params;
-    if (wallet === undefined) wallet = "";
+    if (user_id === undefined) user_id = "";
 
-    let _result = await GetProducts(wallet, filter, lang, pages);
+    let _result = await GetProducts(user_id, filter, lang, pages);
     res.status(_result.code).send(_result);
   };
 
@@ -25,12 +25,12 @@ class MarketController {
   };
 
   item = async (req: any, res: any) => {
-    let { wallet } = req.cookies;
+    let { user_id } = req.cookies;
     let { params } = req.body;
     let { lang, id } = params;
-    if (wallet === undefined) wallet = "";
+    if (user_id === undefined) user_id = "";
 
-    let _result = await GetProductItem(wallet, lang, id);
+    let _result = await GetProductItem(user_id, lang, id);
     res.status(_result.code).send(_result);
   };
 
