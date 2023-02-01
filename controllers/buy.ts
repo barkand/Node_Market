@@ -7,10 +7,12 @@ import {
   SavePrice,
   SaveForSale,
 } from "../business/buy";
+import { GetProduct } from "../business/product";
 
 import { verifyToken } from "../../admin";
 
 import { ActiveNotify } from "../../admin/business/notify";
+import { SaveFile } from "../../core";
 
 class BuyController {
   buyByUser = async (req: any, res: any) => {
@@ -54,6 +56,23 @@ class BuyController {
       res.status(_verify.code).send(_verify);
       return;
     }
+
+    let _res: any = await GetProduct(product);
+    let _prod: any = _res.data;
+    var data = `{
+      "name": "${_prod.nameEn}",
+      "description": "Footballiga NFT Card",
+      "image": "${
+        process.env.SITE_PATH
+      }/products/${_prod.cardEn.toLowerCase()}/${product}.png",
+      "external_url": "${process.env.SITE_PATH}/#/Item/${product}"
+}`;
+    SaveFile(
+      data,
+      `${
+        process.env.SERVER_PATH
+      }/metadata/${_prod.cardEn.toLowerCase()}/${product}.json`
+    );
 
     let _result = await SetBuy(user_id, product, price, txn);
     res.status(_result.code).send(_result);
