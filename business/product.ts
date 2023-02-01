@@ -78,6 +78,7 @@ const GetProducts = async (
     _products.forEach((product: any) => {
       products.push({
         id: product.id,
+        nameEn: product.nameEn,
         image: `${product.cardEn.toLowerCase()}/${product.code}.png`,
         price: product.price,
         liked:
@@ -191,6 +192,7 @@ const GetProductItem = async (
       code: product.code,
       number: product.number,
       age: product.age,
+      nameEn: product.nameEn,
       name: lang === "en" ? product.nameEn : product.nameFa,
       team: lang === "en" ? product.teamEn : product.teamFa,
       country: lang === "en" ? product.countryEn : product.countryFa,
@@ -211,6 +213,22 @@ const GetProductItem = async (
     };
   } catch (e: any) {
     logger.error(`${path}GetProductItem: ${e}`);
+    return response.error;
+  }
+};
+
+const GetProduct = async (product_id: number) => {
+  try {
+    let product: any = await GetCache(`GetProduct:${product_id}`);
+
+    if (!product) {
+      product = await Products.findOne({ id: product_id }, { _id: 0 });
+      SetCache(`GetProduct:${product_id}`, product);
+    }
+
+    return { ...response.success, data: product };
+  } catch (e: any) {
+    logger.error(`${path}GetProduct: ${e}`);
     return response.error;
   }
 };
@@ -241,4 +259,10 @@ const GetGroups = async (lang: string) => {
   }
 };
 
-export { GetProducts, GetProductsFilter, GetProductItem, GetGroups };
+export {
+  GetProducts,
+  GetProductsFilter,
+  GetProductItem,
+  GetProduct,
+  GetGroups,
+};
