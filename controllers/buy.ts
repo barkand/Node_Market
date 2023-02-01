@@ -67,7 +67,7 @@ class BuyController {
       }/products/${_prod.cardEn.toLowerCase()}/${product}.png",
       "external_url": "${process.env.SITE_PATH}/#/Item/${product}"
 }`;
-    SaveFile(data, `${process.env.SERVER_PATH}/metadata/${NFT_id}.json`);
+    SaveFile(data, "metadata", `${NFT_id}.json`);
 
     let _result = await SetBuy(user_id, product, price, txn);
     res.status(_result.code).send(_result);
