@@ -49,7 +49,7 @@ class BuyController {
   saveBuy = async (req: any, res: any) => {
     const { user_id, token } = req.cookies;
     let { params } = req.body;
-    let { product, price, txn } = params;
+    let { product, NFT_id, price, txn } = params;
 
     let _verify = await verifyToken(token);
     if (_verify.code !== 200) {
@@ -67,12 +67,7 @@ class BuyController {
       }/products/${_prod.cardEn.toLowerCase()}/${product}.png",
       "external_url": "${process.env.SITE_PATH}/#/Item/${product}"
 }`;
-    SaveFile(
-      data,
-      `${
-        process.env.SERVER_PATH
-      }/metadata/${_prod.cardEn.toLowerCase()}/${product}.json`
-    );
+    SaveFile(data, `${process.env.SERVER_PATH}/metadata/${NFT_id}.json`);
 
     let _result = await SetBuy(user_id, product, price, txn);
     res.status(_result.code).send(_result);
