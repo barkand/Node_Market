@@ -20,6 +20,7 @@ MarketRouters.get("/", (req: any, res: any) => {
       /buy
       /history
       /check-buy
+      /validate-buys
       /save-buy
       /update-price
       /get-groups
@@ -42,6 +43,7 @@ MarketRouters.post(`/buys`, buyController.buyByUser);
 MarketRouters.post(`/buy`, buyController.buy);
 MarketRouters.post(`/history`, buyController.buyByItem);
 MarketRouters.post(`/check-buy`, buyController.checkBuy);
+MarketRouters.post(`/validate-buys`, buyController.validateBuy);
 MarketRouters.post(`/save-buy`, buyController.saveBuy);
 MarketRouters.post(`/update-price`, buyController.updatePrice);
 MarketRouters.post(`/save-sale`, buyController.saveForSale);

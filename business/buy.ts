@@ -102,6 +102,18 @@ const CheckBuy = async (product_id: number) => {
   }
 };
 
+const ValidateBuy = async (user_id: number) => {
+  try {
+    let _buys = await Buys.find({ user_id: user_id });
+    if (_buys.length > 9) return response.custom(300, "full");
+
+    return response.success;
+  } catch (e: any) {
+    logger.error(`${path}ValidateBuy: ${e}`);
+    return response.error;
+  }
+};
+
 const SavePrice = async (
   user_id: string,
   product_id: number,
@@ -151,6 +163,7 @@ export {
   GetBuy,
   SetBuy,
   CheckBuy,
+  ValidateBuy,
   SavePrice,
   SaveForSale,
 };

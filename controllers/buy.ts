@@ -4,6 +4,7 @@ import {
   GetBuy,
   SetBuy,
   CheckBuy,
+  ValidateBuy,
   SavePrice,
   SaveForSale,
 } from "../business/buy";
@@ -85,6 +86,13 @@ class BuyController {
     }
 
     let _result = await CheckBuy(product);
+    res.status(_result.code).send(_result);
+  };
+
+  validateBuy = async (req: any, res: any) => {
+    const { user_id } = req.cookies;
+
+    let _result = await ValidateBuy(user_id);
     res.status(_result.code).send(_result);
   };
 
