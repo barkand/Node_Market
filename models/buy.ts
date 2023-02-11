@@ -7,6 +7,10 @@ const buySchema = new Schema({
   product_id: { type: Number },
   price: { type: Number },
   txn: { type: String },
+  new_price: { type: Number },
+  for_sale: { type: Boolean },
+  soled: { type: Boolean },
+  new_txn: { type: String },
 });
 
 export default mongoose.model("Buy", buySchema);

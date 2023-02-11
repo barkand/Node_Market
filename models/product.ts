@@ -19,7 +19,6 @@ const productsSchema = new Schema({
   cardFa: { type: String },
   cardEn: { type: String },
   price: { type: Number },
-  forSale: { type: Boolean },
 });
 
 export default mongoose.model("Products", productsSchema);

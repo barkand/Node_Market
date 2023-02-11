@@ -7,7 +7,7 @@ const path = "Market>Business>buy>";
 
 const GetBuyByUser = async (user_id: string, pages: any) => {
   try {
-    let buys: any = await Buys.find({ user_id: user_id });
+    let buys: any = await Buys.find({ user_id: user_id, soled: false });
     let counts = await Buys.find({ user_id: user_id }).count();
     let favorites: any = await Favorites.find({ user_id: user_id });
 
@@ -71,15 +71,26 @@ const SetBuy = async (
   txn: string
 ) => {
   try {
-    let _buys = new Buys({
+    await Buys.updateOne(
+      {
+        product_id: product_id,
+        new_price: price,
+        for_sale: true,
+        soled: false,
+      },
+      { new_txn: txn, for_sale: false, soled: true }
+    );
+
+    let new_buys = new Buys({
       user_id: user_id,
       product_id: product_id,
       price: price,
       txn: txn,
+      new_price: price,
+      for_sale: false,
+      soled: false,
     });
-    await _buys.save();
-
-    await Products.updateOne({ id: product_id }, { $set: { forSale: false } });
+    await new_buys.save();
 
     return response.success;
   } catch (e: any) {
@@ -104,7 +115,7 @@ const CheckBuy = async (product_id: number) => {
 
 const ValidateBuy = async (user_id: number) => {
   try {
-    let _buys = await Buys.find({ user_id: user_id });
+    let _buys = await Buys.find({ user_id: user_id, soled: false });
     if (_buys.length > 9) return response.custom(300, "full");
 
     return response.success;
@@ -123,6 +134,7 @@ const SavePrice = async (
     let _bought = await Buys.findOne({
       user_id: user_id,
       product_id: product_id,
+      new_price: price,
     });
     if (!_bought) return response.error;
 
@@ -140,14 +152,8 @@ const SaveForSale = async (
   forSale: boolean
 ) => {
   try {
-    let _bought = await Buys.findOne({
-      user_id: user_id,
-      product_id: product_id,
-    });
-    if (!_bought) return response.error;
-
-    await Products.updateOne(
-      { id: product_id },
+    await Buys.updateOne(
+      { user_id: user_id, product_id: product_id },
       { $set: { forSale: forSale } }
     );
     return response.success;

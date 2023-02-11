@@ -87,7 +87,12 @@ const GetProducts = async (
             : favorites.some((fav: any) => fav.product_id === product.id),
         soled: buys.some((b: any) => b.product_id === product.id),
         forSale:
-          product.forSale &&
+          buys.some(
+            (b: any) =>
+              b.product_id === product.id &&
+              b.soled === false &&
+              b.forSale === true
+          ) &&
           !buys.some(
             (b: any) => b.product_id === product.id && b.user_id === user_id
           ),
@@ -167,7 +172,7 @@ const GetProductItem = async (
       SetCache(`ProductsItem:${product_id}`, product);
     }
 
-    let _buy = await Buys.findOne({ product_id: product.id });
+    let _buy: any = await Buys.findOne({ product_id: product.id });
     let soled = _buy ? true : false;
     let liked: any =
       user_id === "" ||
@@ -175,6 +180,9 @@ const GetProductItem = async (
         0
         ? false
         : true;
+    let forSale = _buy.some(
+      (b: any) => b.soled === false && b.forSale === true
+    );
 
     let notified: any =
       user_id === "" ||
@@ -202,7 +210,7 @@ const GetProductItem = async (
       price: product.price,
       liked: liked,
       soled: soled,
-      forSale: product.forSale,
+      forSale: forSale,
       notified: notified,
       owner: _buy?.user_id,
     };
