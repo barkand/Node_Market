@@ -74,6 +74,21 @@ class BuyController {
     res.status(_result.code).send(_result);
   };
 
+  saveTransfer = async (req: any, res: any) => {
+    const { user_id, token } = req.cookies;
+    let { params } = req.body;
+    let { product_id, price, txn } = params;
+
+    let _verify = await verifyToken(token);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
+
+    let _result = await SetBuy(user_id, product_id, price, txn);
+    res.status(_result.code).send(_result);
+  };
+
   checkBuy = async (req: any, res: any) => {
     const { token } = req.cookies;
     let { params } = req.body;
@@ -99,7 +114,7 @@ class BuyController {
   updatePrice = async (req: any, res: any) => {
     const { user_id, token } = req.cookies;
     let { params } = req.body;
-    let { product, price } = params;
+    let { product_id, price } = params;
 
     let _verify = await verifyToken(token);
     if (_verify.code !== 200) {
@@ -107,14 +122,14 @@ class BuyController {
       return;
     }
 
-    let _result = await SavePrice(user_id, product, price);
+    let _result = await SavePrice(user_id, product_id, price);
     res.status(_result.code).send(_result);
   };
 
   saveForSale = async (req: any, res: any) => {
     const { user_id, token } = req.cookies;
     let { params } = req.body;
-    let { product, forSale } = params;
+    let { product_id, for_sale } = params;
 
     let _verify = await verifyToken(token);
     if (_verify.code !== 200) {
@@ -122,13 +137,13 @@ class BuyController {
       return;
     }
 
-    let _result_save = await SaveForSale(user_id, product, forSale);
+    let _result_save = await SaveForSale(user_id, product_id, for_sale);
     if (_result_save.code !== 200) {
       res.status(_result_save.code).send(_result_save);
       return;
     }
 
-    let _result_active_notify = await ActiveNotify(product);
+    let _result_active_notify = await ActiveNotify(product_id);
 
     res.status(_result_active_notify.code).send(_result_active_notify);
   };
