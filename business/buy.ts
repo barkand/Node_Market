@@ -131,14 +131,11 @@ const SavePrice = async (
   price: number
 ) => {
   try {
-    let _bought = await Buys.findOne({
-      user_id: user_id,
-      product_id: product_id,
-      new_price: price,
-    });
-    if (!_bought) return response.error;
+    await Buys.updateOne(
+      { user_id: user_id, product_id: product_id, soled: false },
+      { $set: { new_price: price } }
+    );
 
-    await Products.updateOne({ id: product_id }, { $set: { price: price } });
     return response.success;
   } catch (e: any) {
     logger.error(`${path}SavePrice: ${e}`);
@@ -149,12 +146,12 @@ const SavePrice = async (
 const SaveForSale = async (
   user_id: string,
   product_id: number,
-  forSale: boolean
+  for_sale: boolean
 ) => {
   try {
     await Buys.updateOne(
-      { user_id: user_id, product_id: product_id },
-      { $set: { forSale: forSale } }
+      { user_id: user_id, product_id: product_id, soled: false },
+      { $set: { for_sale: for_sale } }
     );
     return response.success;
   } catch (e: any) {

@@ -31,7 +31,7 @@ const GetFavorites = async (user_id: string, pages: any) => {
         soled:
           (await Buys.count({ product_id: product.id })) > 0 ? true : false,
         forSale:
-          product.forSale &&
+          product.for_sale &&
           (await Buys.count({ product_id: product.id, user_id: user_id })) === 0
             ? true
             : false,
