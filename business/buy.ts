@@ -115,8 +115,9 @@ const CheckBuy = async (product_id: number) => {
 
 const ValidateBuy = async (user_id: number) => {
   try {
-    let _buys = await Buys.find({ user_id: user_id, soled: false });
-    if (_buys.length > 9) return response.custom(300, "full");
+    let _buys_count = await Buys.count({ user_id: user_id, soled: false });
+    if (_buys_count >= parseInt(process.env.MAXIMUM_CARD))
+      return response.custom(300, "full");
 
     return response.success;
   } catch (e: any) {
