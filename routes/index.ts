@@ -8,30 +8,6 @@ import chartController from "../controllers/chart";
 const MarketRouters = express.Router();
 MarketRouters.use(express.json());
 
-MarketRouters.get("/", (req: any, res: any) => {
-  res.send(
-    `
-      /products
-      /filters
-      /item
-      /favorites
-      /save-favorite
-      /buys
-      /buy
-      /history
-      /check-buy
-      /validate-buys
-      /save-buy
-      /save-transfer
-      /update-price
-      /get-groups
-      /chart-avg-ages
-      /chart-cnt-position
-      /chart-cnt-sales
-    `
-  );
-});
-
 MarketRouters.post(`/products`, marketController.products);
 MarketRouters.post(`/filters`, marketController.filters);
 MarketRouters.post(`/item`, marketController.item);
